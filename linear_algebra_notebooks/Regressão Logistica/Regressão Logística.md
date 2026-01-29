@@ -49,7 +49,7 @@ O objetivo é predizer o risco de
 Construí uma classe auxiliar básica para fazer analise exploratória com o seaborn.
 Analise Exploratória de Dados: 
 
-![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\doubleplot.png|300](file:///c%3A/Users/dougl/Estatistica%20e%20Machine%20Learning/Regress%C3%A3o%20Logistica/doubleplot.png)
+![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\doubleplot.png|300](linear_algebra_notebooks/Regressão Logistica/doubleplot.png)
 Filtrei 
 Tratamento de Dados:
 	Os dados faltantes foram substituidos pela média dos outros
@@ -95,14 +95,14 @@ Definição dos Parâmetros e PCA(Classificação dos Grupos)
 Usando um código já nesse repositório, eu fiz o PCA para identificar quais componentes possuem maior variância. De fato, usar todos os componentes diminui a acurácia e o melhor resultado  obtido foi com 9 componentes. 
 Os dados são muito desbalanceados e a distribuição não permite separar em grupos claros, o que indica que o modelo não vai ser treinado corretamente:
 
-![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\PCA.png|300](file:///c%3A/Users/dougl/Estatistica%20e%20Machine%20Learning/Regress%C3%A3o%20Logistica/PCA.png)
+![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\PCA.png|300](linear_algebra_notebooks/Regressão Logistica/PCA.png)
 
 
 Superfície Otimizada
 
 A função de perda realmente é concava, e se parece com algo assim nos dois primeiros betas.
 
-![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\output.png|300](file:///c%3A/Users/dougl/Estatistica%20e%20Machine%20Learning/Regress%C3%A3o%20Logistica/output.png)
+![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\output.png|300](linear_algebra_notebooks/Regressão Logistica/output.png)
 
 Resultados:
 
