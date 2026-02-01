@@ -1,121 +1,186 @@
 
-Recursos de Aprendizado: Mathematics for Machine Learning(Peter Deisenroth), CS229, MIT 18.650 Statistics for Applications, Fall 2016
+# Regressão Logística
 
-A regressão logística faz parte de uma classe de algoritmos de classificação supervisionado, podendo ser indicado como o modelo mais simples de classificação.
+**Recursos de Aprendizado:** Mathematics for Machine Learning (Peter Deisenroth), CS229, MIT 18.650 Statistics for Applications, Fall 2016
 
+---
 
-Bases Matemáticas:
+## Introdução
 
-Temos várias atributos e uma resposta binária. Ou seja,  Yi|Xi  tem uma distribuição binomial ( Yi|Xi ~ B(theta,phi,b)) . A distribuição binomial faz parte das famílias exponenciais, uma família de distribuições paramétricas. A vantagem é que a função custo é sempre uma função convexa, podendo ser otimizada por métodos como Newthon Raphson, Gradient Descent Batch ou Estocástico, ou mesmo least Squares( uma vez que podemos obter uma função tal que o modelo é dado por uma relação linear) , o que torna muito fácil criar modelos para esses tipos de dados.  
+A regressão logística faz parte de uma classe de algoritmos de **classificação supervisionada**, sendo considerado o modelo mais simples de classificação binária.
 
-Esse tipo de modelo exige que não haja interação entre as variáveis análisadas, isso é, todas as variaveis sejam estatisticamente independentes(Não chequei isso no meu modelo):
+---
 
-E(xy) = E(x)E(y)
+## Bases Matemáticas
 
-Propriedades das famílias exponenciais:
-$$
-E(\frac{\partial log(p_\theta(y|x))}{\partial{\theta}}) = 0 
-$$$$E(\frac{\partial^2log(p_\theta(y|x))}{\partial{\theta^2}}) = E(\frac{\partial log(p_\theta(y|x))}{\partial{\theta}})^2$$
+Dado um conjunto de atributos $X$ e uma resposta binária $Y$, temos que $Y_i | X_i$ segue uma distribuição de Bernoulli:
 
+$$Y_i | X_i \sim \text{Bernoulli}(p_i)$$
 
-DataSet Usado:
+onde $p_i = \sigma(\theta^T X_i)$ e $\sigma$ é a função sigmoide (logística):
 
-Usei o dataset de Doenças cardiacas disponível no Kaggle :
+$$\sigma(z) = \frac{1}{1 + e^{-z}}$$
 
-```
+### Por que usar famílias exponenciais?
+
+A distribuição de Bernoulli pertence às **famílias exponenciais**, o que garante que a função de custo (log-likelihood negativa) seja **convexa**. Isso permite otimização eficiente por métodos como:
+
+- Gradient Descent (Batch ou Estocástico)
+- Newton-Raphson
+- BFGS
+
+### Premissa de Independência
+
+O modelo assume que as variáveis são **estatisticamente independentes**:
+
+$$E(XY) = E(X)E(Y)$$
+
+> ⚠️ **Nota:** Não verifiquei essa premissa no meu modelo.
+
+### Propriedades das Famílias Exponenciais
+
+$$E\left(\frac{\partial \log p_\theta(y|x)}{\partial \theta}\right) = 0$$
+
+$$E\left(\frac{\partial^2 \log p_\theta(y|x)}{\partial \theta^2}\right) = -E\left(\frac{\partial \log p_\theta(y|x)}{\partial \theta}\right)^2$$
+
+> 💡 **Dica:** A segunda propriedade é conhecida como **Informação de Fisher** e é fundamental para entender a variância dos estimadores.
+
+---
+
+## Dataset Utilizado
+
+Dataset de doenças cardíacas disponível no [Kaggle](https://www.kaggle.com/datasets/dileep070/heart-disease-prediction-using-logistic-regression):
+
+```python
 import kagglehub
 dataset_path = kagglehub.dataset_download("dileep070/heart-disease-prediction-using-logistic-regression")
 ```
 
-Os dados são distribuidos em vários fatores que podem contribuir com doenças cardiacas:
+### Variáveis do Dataset
 
-male: 0 - 1
-age: 32 - 70 Anos
-education: 1.0 - 4.0 Anos
-currentSmoker: 0 - 1
-cigsPerDay: 0.0 - 70.0 
-BPMeds: 0.0 - 1.0
-prevalentStroke: 0 - 1 
-prevalentHyp: 0 - 1
-diabetes: 0 - 1
-totChol: 113.0 - 600.0 
-sysBP: 83.5 - 295.0
-diaBP: 48.0 - 142.5
-BMI: 15.54 - 56.8 kg/m²
-heartRate: 44.0 - 143.0 BPM
-glucose: 40.0 - 394.0 mg/L
+| Variável | Descrição | Range |
+|----------|-----------|-------|
+| `male` | Sexo masculino | 0 - 1 |
+| `age` | Idade | 32 - 70 anos |
+| `education` | Escolaridade | 1.0 - 4.0 |
+| `currentSmoker` | Fumante atual | 0 - 1 |
+| `cigsPerDay` | Cigarros por dia | 0.0 - 70.0 |
+| `BPMeds` | Medicação para pressão | 0.0 - 1.0 |
+| `prevalentStroke` | Histórico de AVC | 0 - 1 |
+| `prevalentHyp` | Hipertensão | 0 - 1 |
+| `diabetes` | Diabetes | 0 - 1 |
+| `totChol` | Colesterol total | 113.0 - 600.0 |
+| `sysBP` | Pressão sistólica | 83.5 - 295.0 |
+| `diaBP` | Pressão diastólica | 48.0 - 142.5 |
+| `BMI` | Índice de massa corporal | 15.54 - 56.8 kg/m² |
+| `heartRate` | Frequência cardíaca | 44.0 - 143.0 BPM |
+| `glucose` | Glicose | 40.0 - 394.0 mg/dL |
 
-O objetivo é predizer o risco de 
-Construí uma classe auxiliar básica para fazer analise exploratória com o seaborn.
-Analise Exploratória de Dados: 
+**Objetivo:** Predizer o risco de doença cardíaca em 10 anos.
 
-![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\doubleplot.png|300](linear_algebra_notebooks/Regressão Logistica/doubleplot.png)
-Filtrei 
-Tratamento de Dados:
-	Os dados faltantes foram substituidos pela média dos outros
-	
-Fonte: Introdução à Estatística, Mario F Triola 
+---
 
-Base Weights:
+## Análise Exploratória de Dados
 
-Para tentar resolver o enviesamento dos dados, coloquei um peso no gradiente, com base na proporção dos dados:
+Construí uma classe auxiliar para análise exploratória com Seaborn.
 
-```
+![Análise Exploratória](linear_algebra_notebooks/Regressão%20Logistica/doubleplot.png)
+
+### Tratamento de Dados
+
+- **Dados faltantes:** substituídos pela média das demais observações.
+
+> 📚 **Fonte:** Introdução à Estatística, Mario F. Triola
+
+---
+
+## Lidando com Dados Desbalanceados
+
+### Class Weights
+
+Para mitigar o enviesamento, apliquei pesos inversamente proporcionais à frequência de cada classe no gradiente:
+
+```python
 def grad(self, theta):
-
-        predictions = self.inv_Logistic_link(self.X @ theta)
-
-        # Calcula class weights
-
-        n_samples = len(self.Y)
-
-        n_classes = 2
-
-        n_class_0 = np.sum(self.Y == 0)
-
-        n_class_1 = np.sum(self.Y == 1)
-
-        # Weight inversamente proporcional à frequência
-
-        weight_0 = n_samples / (n_classes * n_class_0)
-
-        weight_1 = n_samples / (n_classes * n_class_1)
-
-        # Aplica pesos aos erros
-
-        weights = np.where(self.Y == 1, weight_1, weight_0)
-
-        errors = (predictions - self.Y) * weights
-
-        return self.X.T @ errors
+	predictions = self.inv_Logistic_link(self.X @ theta)
+	
+	n_samples = len(self.Y)
+	n_classes = 2
+	n_class_0 = np.sum(self.Y == 0)
+	n_class_1 = np.sum(self.Y == 1)
+	
+	# Peso inversamente proporcional à frequência
+	weight_0 = n_samples / (n_classes * n_class_0)
+	weight_1 = n_samples / (n_classes * n_class_1)
+	
+	weights = np.where(self.Y == 1, weight_1, weight_0)
+	errors = (predictions - self.Y) * weights
+	
+	return self.X.T @ errors
 ```
 
+> 💡 **Conceito:** Ao dar mais peso para a classe minoritária, forçamos o modelo a "prestar mais atenção" nela durante o treinamento.
 
-Definição dos Parâmetros e PCA(Classificação dos Grupos)
-Usando um código já nesse repositório, eu fiz o PCA para identificar quais componentes possuem maior variância. De fato, usar todos os componentes diminui a acurácia e o melhor resultado  obtido foi com 9 componentes. 
-Os dados são muito desbalanceados e a distribuição não permite separar em grupos claros, o que indica que o modelo não vai ser treinado corretamente:
+---
 
-![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\PCA.png|300](linear_algebra_notebooks/Regressão Logistica/PCA.png)
+## Redução de Dimensionalidade com PCA
 
+Utilizei PCA para identificar os componentes de maior variância. O melhor resultado foi obtido com **9 componentes**.
 
-Superfície Otimizada
+> ⚠️ Os dados são muito desbalanceados e a distribuição não permite separar grupos claros, indicando limitações no treinamento.
 
-A função de perda realmente é concava, e se parece com algo assim nos dois primeiros betas.
+![PCA](linear_algebra_notebooks/Regressão%20Logistica/PCA.png)
 
-![C:\Users\dougl\Estatistica e Machine Learning\Regressão Logistica\output.png|300](linear_algebra_notebooks/Regressão Logistica/output.png)
+---
 
-Resultados:
+## Visualização da Superfície de Custo
 
-O modelo consegui 83% de acurácia, mas olhando a matriz de confusão, percebemos que  eles tende a chutar todo mundo como negativo:
+A função de perda é convexa (côncava no caso da log-likelihood). Visualização nos dois primeiros betas:
 
-| Verdadeiro Negativo | Falso Positivo          |
-| ------------------- | ----------------------- |
-| 441                 | 278                     |
-| **Falso Negativo**  | **Verdadeiro Positivo** |
-| 65                  | 64                      |
+![Superfície de Custo](linear_algebra_notebooks/Regressão%20Logistica/output.png)
 
-Apesar de tentar variar o numero de componentes, a taxa de treinamento, colocar um backtracking pra reduzir a taxa de treinamento conforme a perda fosse diminuindo, não resolveu muito. Os dados são muito enviesados e é muito dificil perceber qualquer padrão nas distribuições. Mas fica o aprendizado
+---
 
-To do:
+## Resultados
 
-Adicionar outros métodos de Resolver(NR, BFGS)
+### Matriz de Confusão
+
+|  | Predito Negativo | Predito Positivo |
+|--|------------------|------------------|
+| **Real Negativo** | 500 (VN) | 219 (FP) |
+| **Real Positivo** | 52 (FN) | 77 (VP) |
+
+### Métricas de Avaliação
+
+| Métrica | Valor |
+|---------|-------|
+| Acurácia | 0.68 |
+| Precision | 0.26 |
+| Recall | 0.60 |
+| F1 Score | 0.36 |
+
+> 📖 **Entendendo as métricas:**
+> - **Precision** baixa: muitos falsos positivos
+> - **Recall** razoável: consegue identificar 60% dos casos positivos
+> - **F1 Score** baixo: modelo desbalanceado entre precision e recall
+
+---
+
+## Conclusões e Aprendizados
+
+Apesar das tentativas de ajuste (variação de componentes, taxa de aprendizado, backtracking), os resultados foram limitados devido ao forte **desbalanceamento** dos dados.
+
+### Possíveis Melhorias
+
+- Técnicas de oversampling (SMOTE)
+- Ajuste de threshold de decisão
+- Feature engineering mais elaborado
+
+---
+
+## To Do
+
+- [ ] Implementar Newton-Raphson
+- [ ] Implementar BFGS
+- [ ] Testar SMOTE para balanceamento
+- [ ] Adicionar validação cruzada
